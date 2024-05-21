@@ -1,9 +1,6 @@
 import { LinearProgress, Skeleton, Stack } from '@mui/material'
 
 const Loading = () => {
-    const loader = {
-        value: 0
-    };
 
     return (
         <Stack sx={{ width: '100%', color: 'grey.500' }} spacing={2}>

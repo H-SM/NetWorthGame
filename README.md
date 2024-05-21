@@ -20,17 +20,30 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Things TO DO
 
-To learn more about Next.js, take a look at the following resources:
+- [ ] Application Description for Developer: Net Worth Game
+```We are looking to develop a web application focusing on a net worth game. Here are the specific requirements and functionalities needed:```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [x] Authentication: 
+```Integrate dynamic.xyz as the Web3 authentication provider for secure and efficient user login.```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- [ ] Net Worth Game:
+```Implement a feature where every time a user signs in, their multiplier increases by 1. This multiplier will then be applied to their net worth. Net worth should be calculated by summing up the value of their Ethereum holdings and the value of all their tokens.```
 
-## Deploy on Vercel
+- [ ] Leaderboard:
+```Create a leaderboard that ranks users based on their net worth. Ensure that access to the leaderboard is gated, requiring users to be authenticated via dynamic.xyz to view it.```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] Smart Contract Interactions:
+```Utilize wagmi/viem libraries to facilitate interactions with smart contracts. These tools will manage and execute all necessary smart contract calls within the application.```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [ ] Data Storage and Management:
+    - [ ] Supabase as the primary database solution in conjunction with Prisma for ORM
+    - [ ] Redis for caching
+
+```Implement Supabase as the primary database solution in conjunction with Prisma for ORM to store user settings and scores. Use Redis for caching to enhance performance of the leaderboard by reducing load times and managing data more effectively. Set up a cron job to revalidate the cached data if more than 40 minutes have passed since the last update to ensure user data remains fresh and accurate.```
+
+- [ ] Deployment:
+```Deploy the final application to Vercel for hosting to ensure smooth deployment and scalability.```
+
+If there are any questions or further clarifications required, please let us know.
