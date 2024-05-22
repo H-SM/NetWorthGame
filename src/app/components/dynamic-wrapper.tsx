@@ -31,7 +31,7 @@ const queryClient = new QueryClient();
 
 export default function ProviderWrapper({ children }: React.PropsWithChildren) {
   const router = useRouter();
-  const { random, changeScore, changeSettings } = useContext(ContextValue);
+  const { random, changeScore, changeSettings, multiplerUpdater } = useContext(ContextValue);
   return (
     <DynamicContextProvider
       theme='dark'
@@ -46,7 +46,8 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
             console.log('in onAuthFlowOpen');
           },
           onAuthSuccess: () => {
-            random();
+            multiplerUpdater();
+            console.log("YYESSS")
             router.push("/");
           },
           onLogout: () => {

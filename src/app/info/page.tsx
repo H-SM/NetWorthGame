@@ -1,16 +1,45 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { DynamicWidget, UserProfile, Wallet, useAuthenticateConnectedUser, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useState, useEffect, useContext } from 'react';
+import { DynamicWidget, UserProfile, useAuthenticateConnectedUser, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Loading from '../components/loaderhere';
-import { ContextValue } from "./../context/context";
-import { useContext } from "react";
+import { ContextValue } from "../context/context";
+import { useRouter } from "next/navigation";
+import Loader from "../components/loaderhere";
+import { useBalance, useContractRead } from 'wagmi';
 
 const Page = () => {
+    const router = useRouter();
     const { user, isAuthenticated, handleLogOut } = useDynamicContext();
     const { isAuthenticating } = useAuthenticateConnectedUser();
     const [verifiedCredentials, setVerifiedCredentials] = useState<UserProfile | null>(null);
-    const [balance, setBalance] = useState<string | null>(null);
+    const [ethBalance, setEthBalance] = useState<string | null>(null);
+    const [loader, setLoader] = useState(1);
+    const { theme, toggleTheme, netWorthCalc } = useContext(ContextValue);
+
+    const { data: ethBalanceData } = useBalance({
+        address: '0x4557B18E779944BFE9d78A672452331C186a9f48',
+    });
+
+
+    // 0x4557B18E779944BFE9d78A672452331C186a9f48
+    
+    useEffect(() => {
+        setTimeout(() => {
+            if (isAuthenticated === false && isAuthenticating === false) {
+                setTimeout(() => {
+                    setLoader(0);
+                }, 300);
+                router.push("/login");
+            }
+            else if (isAuthenticated === true && isAuthenticating === false) {
+                setTimeout(() => {
+                    setLoader(0);
+                }, 300);
+            }
+            console.log(isAuthenticating, isAuthenticated);
+        }, 1000)
+    }, [isAuthenticated, isAuthenticating, router]);
 
     useEffect(() => {
         if (user) {
@@ -20,50 +49,55 @@ const Page = () => {
 
     useEffect(() => {
         console.log(isAuthenticating, isAuthenticated);
-    }, [isAuthenticating])
+    }, [isAuthenticating]);
+
     const { primaryWallet } = useDynamicContext();
 
     useEffect(() => {
-        const fetchBalance = async () => {
+        const fetchEthBalance = async () => {
             if (primaryWallet) {
                 const value = await primaryWallet.connector.getBalance();
                 if (value) {
-                    setBalance(value + 0.000001);
+                    setEthBalance(value + 0.000001);
+                    console.log(primaryWallet.address);
+                    netWorthCalc(primaryWallet.address);
                 }
             }
-        };
-        fetchBalance();
+        };  
+
+
+        fetchEthBalance();
     }, [primaryWallet]);
 
-    // console.log(verifiedCredentials);
-    // console.log(isAuthenticated);
-    if (verifiedCredentials === undefined) {
-        //TODO: overlook this state
-        return <Loading />;
-    }
-
-    const { theme, toggleTheme } = useContext(ContextValue);
     return (
-        <div>
-            {isAuthenticated === false ?
-                <div>LOADING...</div>
+        <>
+            {loader === 1 ?
+                <Loader />
                 :
-                verifiedCredentials && verifiedCredentials ? (
-                    <div>
-                        <p>Issuer: {verifiedCredentials.userId}</p>
-                        <p>email: {verifiedCredentials.email}</p>
-                        <p>lastVerifiedCredentialId: {verifiedCredentials.lastVerifiedCredentialId}</p>
-                        <p>environmentId: {verifiedCredentials.environmentId}</p>
-                        <p>username: {verifiedCredentials.verifiedCredentials.length === 3 && verifiedCredentials.verifiedCredentials[2].oauthDisplayName}</p>
-                    </div>
-                ) : (
-                    <p>No verified credentials available</p>
-                )}
+                <div>
+                    {isAuthenticated === false ?
+                        <div>LOADING...</div>
+                        :
+                        verifiedCredentials ? (
+                            <div>
+                                <p>Issuer: {verifiedCredentials.userId}</p>
+                                <p>email: {verifiedCredentials.email}</p>
+                                <p>lastVerifiedCredentialId: {verifiedCredentials.lastVerifiedCredentialId}</p>
+                                <p>environmentId: {verifiedCredentials.environmentId}</p>
+                                <p>username: {verifiedCredentials.verifiedCredentials.length === 3 && verifiedCredentials.verifiedCredentials[2].oauthDisplayName}</p>
+                            </div>
+                        ) : (
+                            <p>No verified credentials available</p>
+                        )}
 
-            {balance ? <p>Wallet Balance: {balance}</p> : <p>Loading balance...</p>}
-            UR THEME : {theme === true ? "dark" : "light"}
-        </div>
+                    {ethBalance ? <p>ETH Balance: {ethBalance}</p> : <p>Loading ETH balance...</p>}
+                    {ethBalanceData ? <p>ETH Balance (wagmi): {ethBalanceData.formatted}</p> : <p>Loading ETH balance...</p>}
+                    <p>OUR THEME : {theme === true ? "dark" : "light"}</p>
+                    {/* <h3>Native Balance: {nativeBalance?.balance.ether} ETH</h3>  */}
+                </div>
+            }
+        </>
     );
-}
+};
 
 export default Page;

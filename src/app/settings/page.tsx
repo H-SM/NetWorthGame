@@ -3,7 +3,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ContextValue } from "./../context/context";
 import { useAuthenticateConnectedUser, useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/navigation";  
 
 const Settings = () => {
   const router = useRouter();

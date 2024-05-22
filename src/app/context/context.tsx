@@ -1,6 +1,7 @@
 "use client";
 
 import { User, UserScores, UserSettings } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type ContextTypes = {
@@ -21,6 +22,8 @@ type ContextTypes = {
             netWorth: number;
         }
     ) => Promise<User | undefined>;
+    netWorthCalc: (address: string) => void;
+    multiplerUpdater: () => void;
 };
 
 const ContextDefaultValues: ContextTypes = {
@@ -32,6 +35,8 @@ const ContextDefaultValues: ContextTypes = {
     toggleTheme: () => { },
     random: () => { },
     fetchOrCreateUser: async () => undefined,
+    netWorthCalc: async (address: string) => { },
+    multiplerUpdater: async () => {},
 };
 
 export const ContextValue = createContext<ContextTypes>(ContextDefaultValues);
@@ -45,6 +50,7 @@ type Props = {
 }
 
 export function ContextProvider({ children }: Props) {
+    const router = useRouter();
     const [theme, setTheme] = useState<boolean>(false);
     const [settings, setSettings] = useState<UserSettings>({} as UserSettings);
     const [scores, setScore] = useState<UserScores>({} as UserScores);
@@ -120,6 +126,100 @@ export function ContextProvider({ children }: Props) {
         }
     };
 
+    const netWorthCalc = async (address: string) => {
+        try {
+            const res = await fetch('/api/wallet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ address })
+            });
+
+            if (res.ok) {
+                const response = await res.json();
+
+                const netWorth: number = response.result.reduce((sum: number, token: { usd_value: number | null }) => {
+                    if (token.usd_value !== null) {
+                        return sum + token.usd_value;
+                    }
+                    return sum;
+                }, 0)
+
+                if (scores.userId) {
+                    // TODO: REDUCE THIS TO 0 [+10 just for testing]
+                    console.log(scores.netWorth, netWorth + 10);
+                    if (scores.netWorth !== netWorth + 10) {
+                        netWorthUpdater(scores.userId, netWorth + 10)
+                    }
+                } else {
+                    // router.push("/login");
+                }
+            } else {
+                throw new Error("Failed to get netWorth");
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    const netWorthUpdater = async (dynamicUserId: string, netWorth: number) => {
+        try {
+            const res = await fetch('/api/settings/balance-updater', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dynamicUserId, netWorth })
+            });
+
+            if (res.ok) {
+                const response = await res.json();
+                setScore(response);
+                console.log("net worth :", netWorth, response);
+            } else {
+                // console.error(response.error);
+                // // TODO: make a modal for this
+                throw new Error("Failed to update netWorth");
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
+
+    const multiplerUpdater = async () => {
+        try {
+            if(scores.userId) {
+            const multiplier = scores.multiplier + 1;
+            const dynamicUserId = scores.userId;
+            const res = await fetch('/api/settings/signin-incrementer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dynamicUserId, multiplier })
+            });
+
+            if (res.ok) {
+                const response = await res.json();
+                setScore(response);
+                console.log(response);
+            } else {
+                // console.error(response.error);
+                // // TODO: make a modal for this
+                throw new Error("Failed to update netWorth");
+            }
+        } else {
+            console.log("no userid");
+            // throw new Error("Failed to get userId");
+        }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
     const value = {
         settings,
         changeSettings,
@@ -128,7 +228,9 @@ export function ContextProvider({ children }: Props) {
         theme,
         toggleTheme,
         random,
-        fetchOrCreateUser
+        fetchOrCreateUser,
+        netWorthCalc,
+        multiplerUpdater
     };
 
     return (

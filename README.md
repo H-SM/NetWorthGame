@@ -22,7 +22,7 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Things TO DO
 
-- [ ] Application Description for Developer: Net Worth Game
+Application Description for Developer: Net Worth Game
 ```We are looking to develop a web application focusing on a net worth game. Here are the specific requirements and functionalities needed:```
 
 - [x] Authentication: 
@@ -38,7 +38,7 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 ```Utilize wagmi/viem libraries to facilitate interactions with smart contracts. These tools will manage and execute all necessary smart contract calls within the application.```
 
 - [ ] Data Storage and Management:
-    - [ ] Supabase as the primary database solution in conjunction with Prisma for ORM
+    - [x] Supabase as the primary database solution in conjunction with Prisma for ORM
     - [ ] Redis for caching
 
 ```Implement Supabase as the primary database solution in conjunction with Prisma for ORM to store user settings and scores. Use Redis for caching to enhance performance of the leaderboard by reducing load times and managing data more effectively. Set up a cron job to revalidate the cached data if more than 40 minutes have passed since the last update to ensure user data remains fresh and accurate.```

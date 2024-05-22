@@ -34,7 +34,7 @@ const Login = () => {
                     picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "", 
                     username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
                     theme: true,
-                    multiplier: 1,
+                    multiplier: 0,
                     netWorth: parseFloat(balance),
                 };
 
