@@ -14,8 +14,8 @@ import { http } from 'viem';
 import { mainnet } from 'viem/chains';
 
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-import { useRouter } from "next/navigation"
-import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect } from "react";
 import { ContextValue } from "./../context/context";
 import { UserScores, UserSettings } from "@prisma/client";
 
@@ -31,7 +31,14 @@ const queryClient = new QueryClient();
 
 export default function ProviderWrapper({ children }: React.PropsWithChildren) {
   const router = useRouter();
-  const { random, changeScore, changeSettings, multiplerUpdater } = useContext(ContextValue);
+  const { toggleMulti, changeScore, changeSettings } = useContext(ContextValue);
+  
+
+  const handleAuthSuccess = () => {
+    toggleMulti();
+    router.push("/");
+  };
+
   return (
     <DynamicContextProvider
       theme='dark'
@@ -45,17 +52,13 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
           onAuthFlowOpen: () => {
             console.log('in onAuthFlowOpen');
           },
-          onAuthSuccess: () => {
-            multiplerUpdater();
-            console.log("YYESSS")
-            router.push("/");
-          },
+          onAuthSuccess: handleAuthSuccess,
           onLogout: () => {
             console.log('in onLogout');
             changeScore({} as UserScores);
             changeSettings({} as UserSettings);
+            toggleMulti();
             router.push("/login");
-
           },
         },
       }}

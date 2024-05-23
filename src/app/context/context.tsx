@@ -2,15 +2,15 @@
 
 import { User, UserScores, UserSettings } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 type ContextTypes = {
     settings: UserSettings;
     changeSettings: (changedSet: UserSettings) => void;
     scores: UserScores;
     changeScore: (changedSet: UserScores) => void;
-    theme: boolean;
-    toggleTheme: () => void;
+    multi: boolean;
+    toggleMulti: () => void;
     random: () => void;
     fetchOrCreateUser: (
         dynamicUserId: string,
@@ -23,7 +23,7 @@ type ContextTypes = {
         }
     ) => Promise<User | undefined>;
     netWorthCalc: (address: string) => void;
-    multiplerUpdater: () => void;
+    multiplerUpdater: (dynamicUserId: string) => void;
 };
 
 const ContextDefaultValues: ContextTypes = {
@@ -31,12 +31,12 @@ const ContextDefaultValues: ContextTypes = {
     changeSettings: (changedSet: UserSettings) => { },
     scores: {} as UserScores,
     changeScore: (changedSet: UserScores) => { },
-    theme: true,
-    toggleTheme: () => { },
+    multi: false,
+    toggleMulti: () => { },
     random: () => { },
     fetchOrCreateUser: async () => undefined,
     netWorthCalc: async (address: string) => { },
-    multiplerUpdater: async () => {},
+    multiplerUpdater: async (dynamicUserId: string) => { },
 };
 
 export const ContextValue = createContext<ContextTypes>(ContextDefaultValues);
@@ -51,12 +51,23 @@ type Props = {
 
 export function ContextProvider({ children }: Props) {
     const router = useRouter();
-    const [theme, setTheme] = useState<boolean>(false);
+    const [multi, setMulti] = useState<boolean>(false);
     const [settings, setSettings] = useState<UserSettings>({} as UserSettings);
     const [scores, setScore] = useState<UserScores>({} as UserScores);
 
-    const toggleTheme = () => {
-        setTheme(!theme);
+    useEffect(() => {
+        const multiValue = JSON.parse(localStorage.getItem('multi') ?? 'false');
+        setMulti(multiValue);
+        const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
+        const scoresValue = JSON.parse(localStorage.getItem('scores') ?? '{}');
+
+        setSettings(settingsValue);
+        setScore(scoresValue);
+    }, []); 
+
+    const toggleMulti = () => {
+        setMulti((prevState) => !prevState);
+        localStorage.setItem('multi', JSON.stringify(multi));
     };
 
     const random = () => {
@@ -64,11 +75,13 @@ export function ContextProvider({ children }: Props) {
     };
 
     const changeSettings = (changedSet: UserSettings) => {
-        setSettings(changedSet)
+        setSettings(changedSet);
+        localStorage.setItem('settings', JSON.stringify(changedSet));
     }
 
     const changeScore = (changedSet: UserScores) => {
-        setScore(changedSet)
+        setScore(changedSet);
+        localStorage.setItem('scores', JSON.stringify(changedSet));
     }
 
     const fetchOrCreateUser = async (
@@ -84,11 +97,20 @@ export function ContextProvider({ children }: Props) {
         try {
             const response = await fetch(`/api/login?dynamicUserId=${dynamicUserId}`);
 
+            const mul : boolean = JSON.parse(localStorage.getItem('multi') ?? 'false') || multi;
+
             if (response.ok) {
                 const user = await response.json();
                 console.log(user);
                 changeSettings(user.settings);
                 changeScore(user.scores);
+                //update multiplier over "multi"
+                console.log(multi);
+                if (mul === true) {
+                    console.log(dynamicUserId);
+                    multiplerUpdater(dynamicUserId);
+                    toggleMulti();
+                }
                 return user;
             } else if (response.status === 404) {
                 // User not found, create a new user
@@ -113,6 +135,10 @@ export function ContextProvider({ children }: Props) {
                     console.log(newUser);
                     changeSettings(newUser.settings);
                     changeScore(newUser.scores);
+                    if (mul === true) {
+                        multiplerUpdater(dynamicUserId);
+                        toggleMulti();
+                    }
                     return newUser;
                 } else {
                     throw new Error("Failed to create a new user");
@@ -189,32 +215,23 @@ export function ContextProvider({ children }: Props) {
         }
     };
 
-    const multiplerUpdater = async () => {
+    const multiplerUpdater = async (dynamicUserId: string) => {
         try {
-            if(scores.userId) {
-            const multiplier = scores.multiplier + 1;
-            const dynamicUserId = scores.userId;
-            const res = await fetch('/api/settings/signin-incrementer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ dynamicUserId, multiplier })
-            });
+                const res = await fetch('/api/settings/signin-incrementer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ dynamicUserId })
+                });
 
-            if (res.ok) {
-                const response = await res.json();
-                setScore(response);
-                console.log(response);
-            } else {
-                // console.error(response.error);
-                // // TODO: make a modal for this
-                throw new Error("Failed to update netWorth");
-            }
-        } else {
-            console.log("no userid");
-            // throw new Error("Failed to get userId");
-        }
+                if (res.ok) {
+                    const response = await res.json();
+                    setScore(response);
+                    console.log(response);
+                } else {
+                    throw new Error("Failed to update netWorth");
+                } 
         } catch (error) {
             console.error(error);
             throw error;
@@ -225,8 +242,8 @@ export function ContextProvider({ children }: Props) {
         changeSettings,
         scores,
         changeScore,
-        theme,
-        toggleTheme,
+        multi,
+        toggleMulti,
         random,
         fetchOrCreateUser,
         netWorthCalc,

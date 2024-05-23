@@ -5,7 +5,6 @@ import { useEffect, useState, useContext } from 'react';
 import { User } from '@prisma/client';
 import { ContextValue } from "./../context/context";
 
-
 const Login = () => {
     const { fetchOrCreateUser } = useContext(ContextValue);
     const { user, isAuthenticated, primaryWallet } = useDynamicContext();
@@ -48,7 +47,6 @@ const Login = () => {
 
         handleFetchOrCreateUser();
     }, [isAuthenticated, isAuthenticating, user, balance]);
-
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center text-white">
