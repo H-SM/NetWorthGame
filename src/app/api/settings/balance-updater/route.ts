@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 export async function POST(request: NextRequest,) {
     try {
         const body = await request.json();
-        const { dynamicUserId, netWorth } = body;
+        const { dynamicUserId, netWorth, totalWorth } = body;
 
         if (!dynamicUserId) {
             return new NextResponse(JSON.stringify({ error: 'dynamicUserId is required' }), { status: 400 });
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest,) {
         // Update the multiplier value
         const updatedScores = await prisma.userScores.update({
             where: { userId: dynamicUserId },
-            data: { netWorth },
+            data: { netWorth, totalWorth },
         });
 
         return NextResponse.json(updatedScores);

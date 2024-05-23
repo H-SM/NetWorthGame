@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient, User } from '@prisma/client';
 import { generateUsername } from "unique-username-generator";
-// import { redis } from '@/app/lib/redis';
 
 const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
@@ -12,8 +11,6 @@ export async function GET(request: NextRequest) {
         if (!dynamicUserId) {
             return new NextResponse(JSON.stringify({ error: 'dynamicUserId is required' }), { status: 400 });
         }
-
-        // await redis.set("hello","world")
 
         const user = await prisma.user.findUnique({
             where: { dynamicUserId },
@@ -37,7 +34,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        let { dynamicUserId, picture, username, theme, multiplier, netWorth } = body;
+        let { dynamicUserId, picture, username, theme, multiplier, netWorth, totalWorth } = body;
 
         if(username === "" ){
             username = generateUsername("", 0, 15);
@@ -68,6 +65,7 @@ export async function POST(request: NextRequest) {
                     create: {
                         multiplier,
                         netWorth,
+                        totalWorth
                     },
                 },
             },

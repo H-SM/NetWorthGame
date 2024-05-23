@@ -28,7 +28,7 @@ Application Description for Developer: Net Worth Game
 - [x] Authentication: 
 ```Integrate dynamic.xyz as the Web3 authentication provider for secure and efficient user login.```
 
-- [ ] Net Worth Game:
+- [x] Net Worth Game:
 ```Implement a feature where every time a user signs in, their multiplier increases by 1. This multiplier will then be applied to their net worth. Net worth should be calculated by summing up the value of their Ethereum holdings and the value of all their tokens.```
 
 - [ ] Leaderboard:
@@ -37,9 +37,9 @@ Application Description for Developer: Net Worth Game
 - [ ] Smart Contract Interactions:
 ```Utilize wagmi/viem libraries to facilitate interactions with smart contracts. These tools will manage and execute all necessary smart contract calls within the application.```
 
-- [ ] Data Storage and Management:
+- [x] Data Storage and Management:
     - [x] Supabase as the primary database solution in conjunction with Prisma for ORM
-    - [ ] Redis for caching
+    - [x] Redis for caching
 
 ```Implement Supabase as the primary database solution in conjunction with Prisma for ORM to store user settings and scores. Use Redis for caching to enhance performance of the leaderboard by reducing load times and managing data more effectively. Set up a cron job to revalidate the cached data if more than 40 minutes have passed since the last update to ensure user data remains fresh and accurate.```
 

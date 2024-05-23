@@ -39,6 +39,7 @@ model UserScores {
   user                    User         @relation(fields: [userId], references: [dynamicUserId])
   multiplier              Int          @default(1)
   netWorth                Float        @default(0)
+  totalWorth              Float        @default(0)
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
 }

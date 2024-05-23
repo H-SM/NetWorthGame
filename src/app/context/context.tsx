@@ -20,6 +20,7 @@ type ContextTypes = {
             theme: boolean;
             multiplier: number;
             netWorth: number;
+            totalWorth: number;
         }
     ) => Promise<User | undefined>;
     netWorthCalc: (address: string) => void;
@@ -92,6 +93,7 @@ export function ContextProvider({ children }: Props) {
             theme: boolean;
             multiplier: number;
             netWorth: number;
+            totalWorth: number;
         }
     ): Promise<User | undefined> => {
         try {
@@ -114,7 +116,7 @@ export function ContextProvider({ children }: Props) {
                 return user;
             } else if (response.status === 404) {
                 // User not found, create a new user
-                const { username, picture, theme, multiplier, netWorth } = info;
+                const { username, picture, theme, multiplier, netWorth, totalWorth } = info;
                 const newUserResponse = await fetch("/api/login", {
                     method: "POST",
                     headers: {
@@ -127,6 +129,7 @@ export function ContextProvider({ children }: Props) {
                         theme,
                         multiplier,
                         netWorth,
+                        totalWorth
                     }),
                 });
 
@@ -174,9 +177,11 @@ export function ContextProvider({ children }: Props) {
 
                 if (scores.userId) {
                     // TODO: REDUCE THIS TO 0 [+10 just for testing]
+                    let totalWorth = (netWorth + 10) * scores.multiplier;
+                    
                     console.log(scores.netWorth, netWorth + 10);
                     if (scores.netWorth !== netWorth + 10) {
-                        netWorthUpdater(scores.userId, netWorth + 10)
+                        netWorthUpdater(scores.userId, netWorth + 10, totalWorth)
                     }
                 } else {
                     // router.push("/login");
@@ -190,14 +195,14 @@ export function ContextProvider({ children }: Props) {
         }
     }
 
-    const netWorthUpdater = async (dynamicUserId: string, netWorth: number) => {
+    const netWorthUpdater = async (dynamicUserId: string, netWorth: number, totalWorth : number) => {
         try {
             const res = await fetch('/api/settings/balance-updater', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ dynamicUserId, netWorth })
+                body: JSON.stringify({ dynamicUserId, netWorth, totalWorth})
             });
 
             if (res.ok) {

@@ -36,10 +36,16 @@ export async function POST(request: NextRequest,) {
         if (user.scores?.multiplier) {
             multiplier = user.scores?.multiplier + 1;
         }
-    
+        
+        let totalWorth = user.scores?.totalWorth;
+
+        if (user.scores?.netWorth) {
+            totalWorth = user.scores?.netWorth * multiplier; 
+        }
+
         const updatedScores = await prisma.userScores.update({
             where: { userId: dynamicUserId },
-            data: { multiplier },
+            data: { multiplier, totalWorth },
         });
 
         return NextResponse.json(updatedScores);

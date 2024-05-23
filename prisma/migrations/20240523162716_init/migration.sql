@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "UserScores" ADD COLUMN     "TotalWorth" DOUBLE PRECISION NOT NULL DEFAULT 0;

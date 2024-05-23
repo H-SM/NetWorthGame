@@ -15,7 +15,7 @@ const Page = () => {
     const [verifiedCredentials, setVerifiedCredentials] = useState<UserProfile | null>(null);
     const [ethBalance, setEthBalance] = useState<string | null>(null);
     const [loader, setLoader] = useState(1);
-    const { theme, toggleTheme, netWorthCalc } = useContext(ContextValue);
+    const { netWorthCalc } = useContext(ContextValue);
 
     const { data: ethBalanceData } = useBalance({
         address: '0x4557B18E779944BFE9d78A672452331C186a9f48',
@@ -92,7 +92,6 @@ const Page = () => {
 
                     {ethBalance ? <p>ETH Balance: {ethBalance}</p> : <p>Loading ETH balance...</p>}
                     {ethBalanceData ? <p>ETH Balance (wagmi): {ethBalanceData.formatted}</p> : <p>Loading ETH balance...</p>}
-                    <p>OUR THEME : {theme === true ? "dark" : "light"}</p>
                     {/* <h3>Native Balance: {nativeBalance?.balance.ether} ETH</h3>  */}
                 </div>
             }
