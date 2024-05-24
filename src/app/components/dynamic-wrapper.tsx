@@ -35,7 +35,7 @@ const queryClient = new QueryClient();
 
 export default function ProviderWrapper({ children }: React.PropsWithChildren) {
   const router = useRouter();
-  const { toggleMulti, changeScore, changeSettings } = useContext(ContextValue);
+  const { multi, toggleMulti, changeScore, changeSettings } = useContext(ContextValue);
 
 
   const handleAuthSuccess = () => {
@@ -61,7 +61,7 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
             console.log('in onLogout');
             changeScore({} as UserScores);
             changeSettings({} as UserSettings);
-            toggleMulti();
+            if(multi === true) toggleMulti();
             router.push("/login");
           },
         },

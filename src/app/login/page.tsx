@@ -28,6 +28,7 @@ const Login = () => {
     useEffect(() => {
         const handleFetchOrCreateUser = async () => {
             if (isAuthenticated && !isAuthenticating && user && balance !== undefined) {
+                console.log(user);
                 const userData = {
                     dynamicUserId: user.userId ?? "",
                     picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "", 

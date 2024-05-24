@@ -3,11 +3,12 @@ import Link from "next/link"
 
 const MainNav = () => {
     return (
-        <div className="flex items-center justify-center">
-            <Link href={"/"} className="ml-6" >Home</Link>
-            <Link href={"/info"} className="ml-6">Info</Link>
-            <Link href={"/login"} className="ml-6">Login</Link>
+        <div className="flex items-center justify-center w-fit h-full">
+            <Link href={"/info"} className="ml-6" >Info</Link>
+            <Link href={"/products"} className="ml-6">Products</Link>
+            <Link href={"/leaderboard"} className="ml-6">Leaderboard</Link>
             <Link href={"/settings"} className="ml-6">Settings</Link>
+            <Link href={"/login"} className="ml-6">Login</Link>
         </div>
     )
 }

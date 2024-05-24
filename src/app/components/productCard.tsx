@@ -8,7 +8,7 @@ interface productType {
 }
 const ProductCard = ({ product } : {product : productType}) => {
   return (
-    <div className="flex items-center justify-center h-screen">
+    // <div className="flex items-center justify-center h-screen">
       <div className="mx-auto bg-white rounded-xl shadow-md overflow-hidden w-4/5 lg:w-2/5">
         <div className="md:flex">
           <div className="md:flex-shrink-0">
@@ -21,7 +21,7 @@ const ProductCard = ({ product } : {product : productType}) => {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 };
 

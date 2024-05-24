@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-
 import { ContextValue } from "./../context/context";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation"
@@ -9,9 +8,9 @@ import { useAuthenticateConnectedUser, useDynamicContext } from "@dynamic-labs/s
 import Loader from "./../components/loaderhere"
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated } = useDynamicContext();
+  const { user, isAuthenticated } = useDynamicContext();
   const { isAuthenticating } = useAuthenticateConnectedUser();
-  const { settings, scores } = useContext(ContextValue);
+  const { settings, scores, manageUser } = useContext(ContextValue);
 
   const [loader, setLoader] = useState(1);
   useEffect(() => {
@@ -23,6 +22,20 @@ export default function Home() {
         router.push("/login");
       }
       else if (isAuthenticated === true && isAuthenticating === false) {
+        const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
+        if (user?.userId !== settingsValue.userId && user) {
+          const userData = {
+            dynamicUserId: user.userId ?? "",
+            picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
+            username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
+            theme: true,
+            multiplier: 1,
+            netWorth: 0,
+            totalWorth: 0,
+          };
+
+          manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
+        }
         setTimeout(() => {
           setLoader(0);
         }, 300);
@@ -31,9 +44,6 @@ export default function Home() {
     }, 1000)
   }, []);
 
-  useEffect(() => {
-    console.log(isAuthenticating, isAuthenticated);
-  }, [isAuthenticating, isAuthenticated])
   return (
     <>
       {loader === 1 ?

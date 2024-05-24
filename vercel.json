@@ -1,0 +1,8 @@
+{
+    "crons": [
+      {
+        "path": "/api/cronjobs/updateLeaderCache",
+        "schedule": "*/40 * * * *"
+      }
+    ]
+  }

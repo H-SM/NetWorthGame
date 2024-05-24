@@ -4,12 +4,23 @@ import { User, UserScores, UserSettings } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
+type userDataTypes = {
+    dynamicUserId: string;
+    picture: string;
+    username: string;
+    theme: boolean;
+    multiplier: number;
+    netWorth: number;
+    totalWorth: number;
+}
+
 type ContextTypes = {
     settings: UserSettings;
     changeSettings: (changedSet: UserSettings) => void;
     scores: UserScores;
     changeScore: (changedSet: UserScores) => void;
     multi: boolean;
+    manageUser: (userData: userDataTypes, address: string) => void;
     toggleMulti: () => void;
     random: () => void;
     fetchOrCreateUser: (
@@ -33,6 +44,7 @@ const ContextDefaultValues: ContextTypes = {
     scores: {} as UserScores,
     changeScore: (changedSet: UserScores) => { },
     multi: false,
+    manageUser: (userData: userDataTypes, address: string) => {},
     toggleMulti: () => { },
     random: () => { },
     fetchOrCreateUser: async () => undefined,
@@ -64,7 +76,19 @@ export function ContextProvider({ children }: Props) {
 
         setSettings(settingsValue);
         setScore(scoresValue);
-    }, []); 
+    }, []);
+
+    //superset function that overlooks changes in the user details
+    const manageUser = async (userData: userDataTypes, address: string) => {
+        try {
+            await fetchOrCreateUser(userData.dynamicUserId, userData);
+            await netWorthCalc(address);
+
+        } catch (error) {
+            console.error('Error fetching or creating user:', error);
+        }
+
+    }
 
     const toggleMulti = () => {
         setMulti((prevState) => !prevState);
@@ -99,7 +123,7 @@ export function ContextProvider({ children }: Props) {
         try {
             const response = await fetch(`/api/login?dynamicUserId=${dynamicUserId}`);
 
-            const mul : boolean = JSON.parse(localStorage.getItem('multi') ?? 'false') || multi;
+            const mul: boolean = JSON.parse(localStorage.getItem('multi') ?? 'false') || multi;
 
             if (response.ok) {
                 const user = await response.json();
@@ -178,7 +202,7 @@ export function ContextProvider({ children }: Props) {
                 if (scores.userId) {
                     // TODO: REDUCE THIS TO 0 [+10 just for testing]
                     let totalWorth = (netWorth + 10) * scores.multiplier;
-                    
+
                     console.log(scores.netWorth, netWorth + 10);
                     if (scores.netWorth !== netWorth + 10) {
                         netWorthUpdater(scores.userId, netWorth + 10, totalWorth)
@@ -195,14 +219,14 @@ export function ContextProvider({ children }: Props) {
         }
     }
 
-    const netWorthUpdater = async (dynamicUserId: string, netWorth: number, totalWorth : number) => {
+    const netWorthUpdater = async (dynamicUserId: string, netWorth: number, totalWorth: number) => {
         try {
             const res = await fetch('/api/settings/balance-updater', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ dynamicUserId, netWorth, totalWorth})
+                body: JSON.stringify({ dynamicUserId, netWorth, totalWorth })
             });
 
             if (res.ok) {
@@ -222,21 +246,21 @@ export function ContextProvider({ children }: Props) {
 
     const multiplerUpdater = async (dynamicUserId: string) => {
         try {
-                const res = await fetch('/api/settings/signin-incrementer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ dynamicUserId })
-                });
+            const res = await fetch('/api/settings/signin-incrementer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dynamicUserId })
+            });
 
-                if (res.ok) {
-                    const response = await res.json();
-                    setScore(response);
-                    console.log(response);
-                } else {
-                    throw new Error("Failed to update netWorth");
-                } 
+            if (res.ok) {
+                const response = await res.json();
+                setScore(response);
+                console.log(response);
+            } else {
+                throw new Error("Failed to update netWorth");
+            }
         } catch (error) {
             console.error(error);
             throw error;
@@ -252,7 +276,8 @@ export function ContextProvider({ children }: Props) {
         random,
         fetchOrCreateUser,
         netWorthCalc,
-        multiplerUpdater
+        multiplerUpdater,
+        manageUser
     };
 
     return (

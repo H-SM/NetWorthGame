@@ -12,62 +12,69 @@ const Page = () => {
     const router = useRouter();
     const { user, isAuthenticated, handleLogOut } = useDynamicContext();
     const { isAuthenticating } = useAuthenticateConnectedUser();
-    const [verifiedCredentials, setVerifiedCredentials] = useState<UserProfile | null>(null);
-    const [ethBalance, setEthBalance] = useState<string | null>(null);
+    // const [verifiedCredentials, setVerifiedCredentials] = useState<UserProfile | null>(null);
     const [loader, setLoader] = useState(1);
-    const { netWorthCalc } = useContext(ContextValue);
+    const { scores, settings, manageUser } = useContext(ContextValue);
 
+    //TODO: look over this
+    let stringer = "";
+    if (user && user.verifiedCredentials?.[0]?.address) {
+        stringer = user.verifiedCredentials?.[0]?.address.slice(2);
+    }
     const { data: ethBalanceData } = useBalance({
-        address: '0x4557B18E779944BFE9d78A672452331C186a9f48',
+        address: `0x${stringer}`,
     });
-
-
-    // 0x4557B18E779944BFE9d78A672452331C186a9f48
     
+
     useEffect(() => {
         setTimeout(() => {
-            if (isAuthenticated === false && isAuthenticating === false) {
-                setTimeout(() => {
-                    setLoader(0);
-                }, 300);
-                router.push("/login");
+          if (isAuthenticated === false && isAuthenticating === false) {
+            setTimeout(() => {
+              setLoader(0);
+            }, 300);
+            router.push("/login");
+          }
+          else if (isAuthenticated === true && isAuthenticating === false) {
+            const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
+            if (user?.userId !== settingsValue.userId && user) {
+              const userData = {
+                dynamicUserId: user.userId ?? "",
+                picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
+                username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
+                theme: true,
+                multiplier: 1,
+                netWorth: 0,
+                totalWorth: 0,
+              };
+    
+              manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
             }
-            else if (isAuthenticated === true && isAuthenticating === false) {
-                setTimeout(() => {
-                    setLoader(0);
-                }, 300);
-            }
-            console.log(isAuthenticating, isAuthenticated);
+  
+            setTimeout(() => {
+              setLoader(0);
+            }, 300);
+          }
+          console.log(isAuthenticating, isAuthenticated);
         }, 1000)
-    }, [isAuthenticated, isAuthenticating, router]);
+      }, []);
 
-    useEffect(() => {
-        if (user) {
-            setVerifiedCredentials(user);
-        }
-    }, [user]);
+    // const { primaryWallet } = useDynamicContext();
 
-    useEffect(() => {
-        console.log(isAuthenticating, isAuthenticated);
-    }, [isAuthenticating]);
-
-    const { primaryWallet } = useDynamicContext();
-
-    useEffect(() => {
-        const fetchEthBalance = async () => {
-            if (primaryWallet) {
-                const value = await primaryWallet.connector.getBalance();
-                if (value) {
-                    setEthBalance(value + 0.000001);
-                    console.log(primaryWallet.address);
-                    netWorthCalc(primaryWallet.address);
-                }
-            }
-        };  
+    // useEffect(() => {
+    //     const fetchEthBalance = async () => {
+    //         if (primaryWallet) {
+    //             const value = await primaryWallet.connector.getBalance();
+    //             if (value) {
+    //                 setEthBalance(value);
+    //                 console.log(primaryWallet.address);
+    //                 netWorthCalc(primaryWallet.address);
+    //             }
+    //         }
+    //     };  
 
 
-        fetchEthBalance();
-    }, [primaryWallet]);
+    //     fetchEthBalance();
+    // }, [primaryWallet]);
 
     return (
         <>
@@ -78,19 +85,19 @@ const Page = () => {
                     {isAuthenticated === false ?
                         <div>LOADING...</div>
                         :
-                        verifiedCredentials ? (
+                        user ? (
                             <div>
-                                <p>Issuer: {verifiedCredentials.userId}</p>
-                                <p>email: {verifiedCredentials.email}</p>
-                                <p>lastVerifiedCredentialId: {verifiedCredentials.lastVerifiedCredentialId}</p>
-                                <p>environmentId: {verifiedCredentials.environmentId}</p>
-                                <p>username: {verifiedCredentials.verifiedCredentials.length === 3 && verifiedCredentials.verifiedCredentials[2].oauthDisplayName}</p>
+                                <p>Issuer: {user.userId}</p>
+                                <p>email: {user.email}</p>
+                                <p>lastVerifiedCredentialId: {user.lastVerifiedCredentialId}</p>
+                                <p>environmentId: {user.environmentId}</p>
+                                <p>username: {settings.username}</p>
                             </div>
                         ) : (
                             <p>No verified credentials available</p>
                         )}
 
-                    {ethBalance ? <p>ETH Balance: {ethBalance}</p> : <p>Loading ETH balance...</p>}
+                    {scores.totalWorth}
                     {ethBalanceData ? <p>ETH Balance (wagmi): {ethBalanceData.formatted}</p> : <p>Loading ETH balance...</p>}
                     {/* <h3>Native Balance: {nativeBalance?.balance.ether} ETH</h3>  */}
                 </div>
