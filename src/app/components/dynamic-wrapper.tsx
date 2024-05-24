@@ -6,25 +6,29 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import {
-  createConfig,
   WagmiProvider,
 } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { http } from 'viem';
-import { mainnet } from 'viem/chains';
+import { http, createConfig } from '@wagmi/core'
+import { mainnet, sepolia } from '@wagmi/core/chains'
+import { injected } from "@wagmi/connectors"
 
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 import { ContextValue } from "./../context/context";
 import { UserScores, UserSettings } from "@prisma/client";
+// import { SepliaSansChromaLogo } from "@dynamic-labs/sdk-react-icons";
 
 const config = createConfig({
-  chains: [mainnet],
+  chains: [ mainnet, sepolia],
   multiInjectedProviderDiscovery: false,
+  connectors: [injected()],
   transports: {
     [mainnet.id]: http(),
+    [sepolia.id]: http(),
   },
+  ssr: true,
 });
 
 const queryClient = new QueryClient();
@@ -32,7 +36,7 @@ const queryClient = new QueryClient();
 export default function ProviderWrapper({ children }: React.PropsWithChildren) {
   const router = useRouter();
   const { toggleMulti, changeScore, changeSettings } = useContext(ContextValue);
-  
+
 
   const handleAuthSuccess = () => {
     toggleMulti();
@@ -65,7 +69,7 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
     >
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <DynamicWagmiConnector>
+          <DynamicWagmiConnector suppressChainMismatchError>
             {children}
           </DynamicWagmiConnector>
         </QueryClientProvider>
