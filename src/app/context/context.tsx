@@ -44,7 +44,7 @@ const ContextDefaultValues: ContextTypes = {
     scores: {} as UserScores,
     changeScore: (changedSet: UserScores) => { },
     multi: false,
-    manageUser: (userData: userDataTypes, address: string) => {},
+    manageUser: (userData: userDataTypes, address: string) => { },
     toggleMulti: () => { },
     random: () => { },
     fetchOrCreateUser: async () => undefined,
@@ -266,6 +266,31 @@ export function ContextProvider({ children }: Props) {
             throw error;
         }
     };
+
+    const settingsUpdater = async (dynamicUserId: string, username: string, theme: boolean, picture: string) => {
+        try {
+            const res = await fetch('/api/settings/settings-updater', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ dynamicUserId, username, theme, picture })
+            });
+
+            if (res.ok) {
+                const response = await res.json();
+                setSettings(response);
+            } else {
+                // console.error(response.error);
+                // // TODO: make a modal for this
+                throw new Error("Failed to update netWorth");
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
+
     const value = {
         settings,
         changeSettings,
