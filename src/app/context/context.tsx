@@ -8,7 +8,6 @@ type userDataTypes = {
     dynamicUserId: string;
     picture: string;
     username: string;
-    theme: boolean;
     multiplier: number;
     netWorth: number;
     totalWorth: number;
@@ -22,13 +21,14 @@ type ContextTypes = {
     multi: boolean;
     manageUser: (userData: userDataTypes, address: string) => void;
     toggleMulti: () => void;
+    theme: boolean;
+    toggleTheme: () => void;
     random: () => void;
     fetchOrCreateUser: (
         dynamicUserId: string,
         info: {
             username: string;
             picture: string;
-            theme: boolean;
             multiplier: number;
             netWorth: number;
             totalWorth: number;
@@ -36,6 +36,7 @@ type ContextTypes = {
     ) => Promise<User | undefined>;
     netWorthCalc: (address: string) => void;
     multiplerUpdater: (dynamicUserId: string) => void;
+    settingsUpdater: (dynamicUserId: string, username: string, picture: string) => void;
 };
 
 const ContextDefaultValues: ContextTypes = {
@@ -46,10 +47,13 @@ const ContextDefaultValues: ContextTypes = {
     multi: false,
     manageUser: (userData: userDataTypes, address: string) => { },
     toggleMulti: () => { },
+    theme: false,
+    toggleTheme: () => { },
     random: () => { },
     fetchOrCreateUser: async () => undefined,
     netWorthCalc: async (address: string) => { },
     multiplerUpdater: async (dynamicUserId: string) => { },
+    settingsUpdater: async (dynamicUserId: string, username: string, picture: string) => { },
 };
 
 export const ContextValue = createContext<ContextTypes>(ContextDefaultValues);
@@ -65,15 +69,25 @@ type Props = {
 export function ContextProvider({ children }: Props) {
     const router = useRouter();
     const [multi, setMulti] = useState<boolean>(false);
+    const [theme, setTheme] = useState<boolean>(false);
     const [settings, setSettings] = useState<UserSettings>({} as UserSettings);
     const [scores, setScore] = useState<UserScores>({} as UserScores);
 
     useEffect(() => {
         const multiValue = JSON.parse(localStorage.getItem('multi') ?? 'false');
-        setMulti(multiValue);
+        const storedTheme = localStorage.getItem('theme');
+        console.log("theme here :", storedTheme);
+        if (storedTheme === null) {
+            localStorage.setItem('theme', 'false');
+            setTheme(false);
+        } else {
+            setTheme(JSON.parse(storedTheme));
+        }
+
         const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
         const scoresValue = JSON.parse(localStorage.getItem('scores') ?? '{}');
 
+        setMulti(multiValue);
         setSettings(settingsValue);
         setScore(scoresValue);
     }, []);
@@ -95,6 +109,11 @@ export function ContextProvider({ children }: Props) {
         localStorage.setItem('multi', JSON.stringify(multi));
     };
 
+    const toggleTheme = () => {
+        setTheme((prevState) => !prevState);
+        localStorage.setItem('theme', JSON.stringify(theme));
+    };
+
     const random = () => {
         console.log("ji");
     };
@@ -114,7 +133,6 @@ export function ContextProvider({ children }: Props) {
         info: {
             username: string;
             picture: string;
-            theme: boolean;
             multiplier: number;
             netWorth: number;
             totalWorth: number;
@@ -140,7 +158,7 @@ export function ContextProvider({ children }: Props) {
                 return user;
             } else if (response.status === 404) {
                 // User not found, create a new user
-                const { username, picture, theme, multiplier, netWorth, totalWorth } = info;
+                const { username, picture, multiplier, netWorth, totalWorth } = info;
                 const newUserResponse = await fetch("/api/login", {
                     method: "POST",
                     headers: {
@@ -150,7 +168,6 @@ export function ContextProvider({ children }: Props) {
                         dynamicUserId,
                         username,
                         picture,
-                        theme,
                         multiplier,
                         netWorth,
                         totalWorth
@@ -239,6 +256,7 @@ export function ContextProvider({ children }: Props) {
                 throw new Error("Failed to update netWorth");
             }
         } catch (error) {
+            settingsUpdater
             console.error(error);
             throw error;
         }
@@ -267,19 +285,19 @@ export function ContextProvider({ children }: Props) {
         }
     };
 
-    const settingsUpdater = async (dynamicUserId: string, username: string, theme: boolean, picture: string) => {
+    const settingsUpdater = async (dynamicUserId: string, username: string, picture: string) => {
         try {
             const res = await fetch('/api/settings/settings-updater', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ dynamicUserId, username, theme, picture })
+                body: JSON.stringify({ dynamicUserId, username, picture })
             });
 
             if (res.ok) {
                 const response = await res.json();
-                setSettings(response);
+                changeSettings(response);
             } else {
                 // console.error(response.error);
                 // // TODO: make a modal for this
@@ -298,11 +316,14 @@ export function ContextProvider({ children }: Props) {
         changeScore,
         multi,
         toggleMulti,
+        theme,
+        toggleTheme,
         random,
         fetchOrCreateUser,
         netWorthCalc,
         multiplerUpdater,
-        manageUser
+        manageUser,
+        settingsUpdater,
     };
 
     return (

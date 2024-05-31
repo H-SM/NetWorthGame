@@ -25,35 +25,34 @@ const Leaderboard = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            if (isAuthenticated === false && isAuthenticating === false) {
-                setTimeout(() => {
-                    setLoader(0);
-                }, 300);
-                router.push("/login");
+          if (isAuthenticated === false && isAuthenticating === false) {
+            setTimeout(() => {
+              setLoader(0);
+            }, 300);
+            router.push("/login");
+          }
+          else if (isAuthenticated === true && isAuthenticating === false) {
+            const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
+            if (user?.userId !== settingsValue.userId && user) {
+              const userData = {
+                dynamicUserId: user.userId ?? "",
+                picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
+                username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
+                multiplier: 1,
+                netWorth: 0,
+                totalWorth: 0,
+              };
+    
+              manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
             }
-            else if (isAuthenticated === true && isAuthenticating === false) {
-                const settingsValue = JSON.parse(localStorage.getItem('settings') ?? '{}');
-                if (user?.userId !== settingsValue.userId && user) {
-                    const userData = {
-                        dynamicUserId: user.userId ?? "",
-                        picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
-                        username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
-                        theme: true,
-                        multiplier: 1,
-                        netWorth: 0,
-                        totalWorth: 0,
-                    };
-
-                    manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
-                }
-
-                setTimeout(() => {
-                    setLoader(0);
-                }, 300);
-            }
-            console.log(isAuthenticating, isAuthenticated);
+  
+            setTimeout(() => {
+              setLoader(0);
+            }, 300);
+          }
+          console.log(isAuthenticating, isAuthenticated);
         }, 1000)
-    }, []);
+      }, []);
 
     const fetchData = async () => {
         const response = await fetch('/api/leaderboard');

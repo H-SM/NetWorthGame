@@ -11,7 +11,7 @@ const Settings = () => {
   const router = useRouter();
   const { user, isAuthenticated } = useDynamicContext();
   const { isAuthenticating } = useAuthenticateConnectedUser();
-  const { settings, scores, manageUser } = useContext(ContextValue);
+  const { settings, manageUser, settingsUpdater, theme, toggleTheme } = useContext(ContextValue);
   const [details, setDetails] = useState<UserSettings>(settings);
 
   useEffect(() => {
@@ -35,7 +35,6 @@ const Settings = () => {
             dynamicUserId: user.userId ?? "",
             picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
             username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
-            theme: true,
             multiplier: 1,
             netWorth: 0,
             totalWorth: 0,
@@ -47,21 +46,19 @@ const Settings = () => {
           setLoader(0);
         }, 300);
       }
-      console.log(isAuthenticating, isAuthenticated);
     }, 1000)
   }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("this is the handle submit");
-    if (settings.username !== details.username || settings.picture !== details.picture || settings.theme !== details.theme) {
-      console.table(details);
+    if (settings.username !== details.username || settings.picture !== details.picture) {
+      settingsUpdater(details.userId, details.username, details.picture);
     }
   }
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDetails({ ...details, [e.target.name]: e.target.value });
-    console.log(details)
   }
 
   return (
@@ -87,7 +84,7 @@ const Settings = () => {
                   <div className="border-b w-[100vh] border-gray-90site_name0/10 pb-12">
                     <h2 className="text-base font-semibold leading-7">
                       Profile
-                    </h2>
+                    </h2>theme, setTheme
                     <p className="mt-1 text-sm leading-6 text-gray-600"></p>
 
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -145,12 +142,12 @@ const Settings = () => {
 
                     <label className="inline-flex items-center cursor-pointer">
                       <input type="checkbox"
-                        value={`${details.theme}`}
-                        checked={details.theme === true}
-                        onChange={() => setDetails({
-                          ...details,
-                          theme: !(details.theme)
-                        })}
+                        checked={theme === true}
+                        onChange={() => {
+                          toggleTheme();
+                          console.log(theme);
+                        }
+                      }
                         className="sr-only peer" />
                       <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                       <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>

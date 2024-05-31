@@ -28,7 +28,7 @@ model UserSettings {
   user                    User         @relation(fields: [userId], references: [dynamicUserId])
   username                String           
   picture                 String      
-  theme                   Boolean      @default(false)
+  // theme                   Boolean      @default(false)
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
 }

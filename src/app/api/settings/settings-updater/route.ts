@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 export async function POST(request: NextRequest,) {
     try {
         const body = await request.json();
-        const { dynamicUserId, username, theme, picture } = body;
+        const { dynamicUserId, username, picture } = body;
 
         if (!dynamicUserId) {
             return new NextResponse(JSON.stringify({ error: 'dynamicUserId is required' }), { status: 400 });
@@ -22,16 +22,13 @@ export async function POST(request: NextRequest,) {
             return new NextResponse(JSON.stringify({ error: 'User not found' }), { status: 404 });
         }
 
-        if(username === "" && theme === user.settings!.theme && username === ""){
-            return new NextResponse(JSON.stringify({ error: 'No data to change' }), { status: 400 });
-        }
-        const updateData = {
-            
-        }
+        // if(username === "" && picture === ""){
+        //     return new NextResponse(JSON.stringify({ error: 'No data to change' }), { status: 404 });
+        // }
         // Update the settings
         const updatedSettings = await prisma.userSettings.update({
             where: { userId: dynamicUserId },
-            data: updateData,
+            data: { username, picture },
         });
 
         return NextResponse.json(updatedSettings);

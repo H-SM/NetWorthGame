@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        let { dynamicUserId, picture, username, theme, multiplier, netWorth, totalWorth } = body;
+        let { dynamicUserId, picture, username, multiplier, netWorth, totalWorth } = body;
 
         if(username === "" ){
             username = generateUsername("", 0, 15);
@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
                 settings: {
                     create: {
                         username,
-                        picture,
-                        theme,
+                        picture,                  
                     },
                 },
                 scores: {
