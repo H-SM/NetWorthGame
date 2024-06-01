@@ -6,6 +6,7 @@ import { useAuthenticateConnectedUser, useDynamicContext } from '@dynamic-labs/s
 import { useRouter } from "next/navigation";
 import Loader from "./../components/loaderhere"
 import { UserSettings } from '@prisma/client';
+import { CldUploadWidget } from 'next-cloudinary';
 
 const Settings = () => {
   const router = useRouter();
@@ -60,6 +61,14 @@ const Settings = () => {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDetails({ ...details, [e.target.name]: e.target.value });
   }
+
+  const handleImageUpload = (result: any) => {
+    const imageUrl = result.info.secure_url;
+    setDetails((prevDetails) => ({
+      ...prevDetails,
+      picture: imageUrl,
+    }));
+  };
 
   return (
     <>
@@ -134,44 +143,58 @@ const Settings = () => {
                               aria-hidden="true"
                             />
                           )}
-                          {/* <CloudinaryUploadWidget showAlert={showAlert} /> */}
-                        </div>
+                          <CldUploadWidget uploadPreset="ppgzrcox" onSuccess={handleImageUpload}
+                          >
+                            {({ open }) => {
+                              return (
+                                <button
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    open(); 
+                                  }}
+                                  className='rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600'>
+                                  Upload an Image
+                                </button>
+                          );  
+                            }}
+                        </CldUploadWidget>
                       </div>
                     </div>
-
-
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input type="checkbox"
-                        checked={theme === true}
-                        onChange={() => {
-                          toggleTheme();
-                          console.log(theme);
-                        }
-                      }
-                        className="sr-only peer" />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                      <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>
-                    </label>
                   </div>
+
+
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input type="checkbox"
+                      checked={theme === true}
+                      onChange={() => {
+                        toggleTheme();
+                        console.log(theme);
+                      }
+                      }
+                      className="sr-only peer" />
+                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Dark Mode</span>
+                  </label>
                 </div>
-                <div className="mt-6 flex items-center justify-end gap-x-6 w-full">
-                  <button
-                    type="button"
-                    className="text-sm font-semibold leading-6"
-                    onClick={() => setDetails(settings)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
             </div>
-          </div>
+            <div className="mt-6 flex items-center justify-end gap-x-6 w-full">
+              <button
+                type="button"
+                className="text-sm font-semibold leading-6"
+                onClick={() => setDetails(settings)}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+    </div >
         </>
       }
     </>
