@@ -12,7 +12,7 @@ export const PayButton = ({ price }: { price: number }) => {
   const { address } = useAccount()
   const { writeContractAsync } = useWriteContract()
   const [started, setStarted] = useState(false)
-  const [errors, setErrors] = useState()
+  const [errors, setErrors] = useState<string>('')
   const [completed, setCompleted] = useState(false)
 
   const handlePayment = async () => {
