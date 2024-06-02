@@ -4,6 +4,8 @@ import { DynamicWidget, useAuthenticateConnectedUser, useDynamicContext } from '
 import { useEffect, useState, useContext } from 'react';
 import { User } from '@prisma/client';
 import { ContextValue } from "./../context/context";
+import logo from "./../assets/logo.png"
+import Image from "next/image";
 
 const Login = () => {
     const { fetchOrCreateUser } = useContext(ContextValue);
@@ -31,9 +33,8 @@ const Login = () => {
                 console.log(user);
                 const userData = {
                     dynamicUserId: user.userId ?? "",
-                    picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "", 
+                    picture: user.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0] ?? "",
                     username: user.verifiedCredentials?.[2]?.oauthUsername ?? "",
-                    theme: true,
                     multiplier: 1,
                     netWorth: parseFloat(balance),
                     totalWorth: parseFloat(balance),
@@ -55,7 +56,7 @@ const Login = () => {
             <div className="flex flex-col items-center justify-center text-center">
                 <div className="mb-6">
                     <div className="inline-flex items-center justify-center">
-                        <img src="/logo.png" alt="logo" />
+                        <Image src={logo} className="w-[20rem]" alt="logo_here" />
                     </div>
                 </div>
                 <h1 className="text-4xl font-bold mb-4">Onboard the world</h1>
@@ -63,37 +64,27 @@ const Login = () => {
                     Web3 login for <span className="text-blue-400">everyone</span>.
                 </p>
                 <DynamicWidget />
-                <button
+                <div
                     className="mt-8 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                    onClick={() => { }}
                 >
-                    Test fetchOrCreateUser
-                </button>
+                    ↑ Click the above widget to Login/Signin ↑
+                </div>
                 <div className="flex mt-16 space-x-4 ">
-                    <a
-                        href="https://docs.dynamic.xyz/"
-                        target="_blank"
-                        rel="noreferrer"
+                    <div
+                        className="p-4 inline-flex items-center justify-center border-2 border-[#3B3636] rounded-lg shadow-lg w-64"
+                    >
+                        <h2 className="font-semibold">Have seemless Transations with smart contract</h2>
+                    </div>
+                    <div
                         className="p-4 inline-flex items-center justify-center rounded-lg border-2 border-[#3B3636] shadow-lg w-64"
                     >
-                        <h2 className="font-semibold">Docs</h2>
-                    </a>
-                    <a
-                        href="https://demo.dynamic.xyz/"
-                        target="_blank"
-                        rel="noreferrer"
+                        <h2 className="font-semibold">Get Your Net Worth</h2>
+                    </div>
+                    <div
                         className="p-4 inline-flex items-center justify-center border-2 border-[#3B3636] rounded-lg shadow-lg w-64"
                     >
-                        <h2 className="font-semibold">Demo</h2>
-                    </a>
-                    <a
-                        href="https://app.dynamic.xyz/"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-4 inline-flex items-center justify-center border-2 border-[#3B3636] rounded-lg shadow-lg w-64"
-                    >
-                        <h2 className="font-semibold">Dashboard</h2>
-                    </a>
+                        <h2 className="font-semibold">View yourself in the Leaderboard</h2>
+                    </div>
                 </div>
             </div>
         </div>

@@ -60,11 +60,11 @@ export const PayButton = ({ price }: { price: number }) => {
   }
 
   return (
-    <>
+    <div className='h-[5rem]'>
       {!completed && (
         <button 
           disabled={started}
-          className="mt-5 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-whi   te bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
+          className="mt-5 px-4 py-2 border text-sm font-medium rounded-md bg-text/5 hover:bg-background hover:text-primary border-opacity-10 transition ease-in-out duration-300 " 
           onClick={handlePayment}
         >
           {started ? "Confirming..." : "Pay Now"}
@@ -72,6 +72,6 @@ export const PayButton = ({ price }: { price: number }) => {
       )}
       {completed && <p className='text-stone-800 mt-2 bg-green-200 rounded-md text-sm py-2 px-4'>Thank you for your payment.</p>}
       {errors && <p className='text-stone-800 mt-2 bg-red-200 rounded-md text-sm py-2 px-4'>{errors}</p>}
-    </>
+    </div>
   )
 }

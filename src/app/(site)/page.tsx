@@ -8,6 +8,7 @@ import { useAuthenticateConnectedUser, useDynamicContext } from "@dynamic-labs/s
 import Loader from "./../components/loaderhere"
 import { useBalance } from "wagmi";
 import supabase from "../lib/supabase";
+import { useSpring, animated } from "react-spring";
 
 interface LeaderboardEntry {
   dynamicUserId: string;
@@ -16,6 +17,22 @@ interface LeaderboardEntry {
   score: number;
 }
 
+interface NumberProps {
+  n: number;
+}
+
+
+
+const Number: React.FC<NumberProps> = ({ n }) => {
+  const { number } = useSpring({
+    from: { number: 0 },
+    number: n,
+    delay: 200,
+    config: { mass: 1, tension: 20, friction: 10 }
+  });
+
+  return <animated.div>{number.to((n) => n.toFixed(0))}</animated.div>
+}
 export default function Home() {
   const router = useRouter();
   const { user, isAuthenticated } = useDynamicContext();
@@ -31,6 +48,8 @@ export default function Home() {
   const { data: ethBalanceData } = useBalance({
     address: `0x${stringer}`,
   });
+
+  const placeholder = "https://avatars.githubusercontent.com/u/98532264?v=4";
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
@@ -57,6 +76,7 @@ export default function Home() {
           manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
         }
         setTimeout(() => {
+          console.log(user);
           setLoader(0);
         }, 300);
       }
@@ -99,72 +119,94 @@ export default function Home() {
       {loader === 1 ?
         <Loader />
         :
-        <>
-          <div>
-            <div className="flex justify-center flex-col items-center">
-              <p>
-                {settings.username}
+        <div className="w-full h-fit my-[10rem] flex flex-wrap justify-center items-center gap-3 z-50 bg-background ">
+          <div className="w-[50rem] rounded-2xl h-[10rem] bg-accent/30 flex justify-evenly items-center font-poppins text-text">
+            <div className="w-[15rem] h-[8rem] flex flex-col justify-center items-center">
+              <p className="text-center font-medium text-[1.1rem]">
+                Net Worth
               </p>
-              <p>
-                USERS NET WORTH
+              <p className="font-bold text-[5rem] text-center mt-[-1.3rem]">
+                <Number n={scores.totalWorth} />
               </p>
-              <p>
-                {scores.multiplier * scores.netWorth}
+            </div>
+
+            <div className="w-[15rem] h-[8rem] flex flex-col justify-center items-center">
+              <p className="text-center font-medium text-[1.1rem]">
+                ETH Balance
+              </p>
+              <p className="font-bold text-[5rem] text-center mt-[-1.3rem]">
+                {ethBalanceData ? <Number n={parseFloat(ethBalanceData.formatted)} /> : <p>0</p>}
+                {/* <Number n={scores.totalWorth} /> */}
+              </p>
+            </div>
+
+            <div className="w-[15rem] h-[8rem] flex flex-col justify-center items-center">
+              <p className="text-center font-medium text-[1.1rem]">
+                Total Balance
+              </p>
+              <p className="font-bold text-[5rem] text-center mt-[-1.3rem]">
+                <Number n={scores.netWorth} />
               </p>
             </div>
           </div>
-          <div>
-            {isAuthenticated === false ?
-              <div>LOADING...</div>
-              :
-              user ? (
-                <div>
-                  <p>Issuer: {user.userId}</p>
-                  <p>email: {user.email}</p>
-                  <p>lastVerifiedCredentialId: {user.lastVerifiedCredentialId}</p>
-                  <p>environmentId: {user.environmentId}</p>
-                  <p>username: {settings.username}</p>
-                </div>
-              ) : (
-                <p>No verified credentials available</p>
-              )}
+          <div className="w-[24rem] rounded-2xl h-[10rem] bg-secondary/30 flex justify-evenly items-center font-poppins text-text">
 
-            {scores.totalWorth}
-            {ethBalanceData ? <p>ETH Balance (wagmi): {ethBalanceData.formatted}</p> : <p>Loading ETH balance...</p>}
+            <div className="w-fit max-w-[15rem] h-[5rem] flex flex-col justify-center items-end text-text ">
+              <p className="font-bold text-[1.2rem]">{settings.username}</p>
+              <p className="text-[1.1rem] ">{ user && user.email}</p>
+              <p className="text-[1.1rem]">{new Date(settings.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}</p>
+            </div>
+            <div className=" rounded-full overflow-hidden">
+              <Image src={`${settings.picture ? settings.picture : placeholder}`} width={100} height={100} alt="pfp" className="w-full object-contain" />
+            </div>
+
             {/* <h3>Native Balance: {nativeBalance?.balance.ether} ETH</h3>  */}
           </div>
-          <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Leaderboard</h1>
-            <table className="min-w-full bg-blue-400">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">Username</th>
-                  <th className="py-2 px-4 border-b">Profile Picture</th>
-                  <th className="py-2 px-4 border-b">Net Worth</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((entry, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border-b">{entry.username}</td>
-                    <td className="py-2 px-4 border-b">
-                      {entry.profilePicture ? (
-                        <img
-                          src={entry.profilePicture}
-                          alt="Profile"
-                          className="w-8 h-8 rounded-full"
-                        />
-                      ) : (
-                        <p>No image</p>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 border-b">{entry.score.toFixed(2)}</td>
+          <div className="w-[75rem] rounded-2xl h-[30rem] bg-secondary/30 flex justify-start items-start font-poppins text-text overflow-y-auto ">
+            <div className="w-full p-4">
+              <h1 className="text-2xl font-bold mb-4 uppercase">Leaderboard</h1>
+              <table className="min-w-full bg-blue-400">
+                <thead>
+                  <tr className="text-left">
+                    <th className="py-2 px-4 border-b">Rank</th>
+                    <th className="py-2 px-4 border-b">Username</th>
+                    <th className="py-2 px-4 border-b">Profile Picture</th>
+                    <th className="py-2 px-4 border-b">Net Worth</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {leaderboard.map((entry, index) => (
+                    <tr key={index}>
+                      <td className="py-2 px-4 border-b">{index + 1}</td>
+                      <td className="py-2 px-4 border-b">{entry.username}</td>
+                      <td className="py-2 px-4 border-b">
+                        {entry.profilePicture ? (
+                          <img
+                            src={entry.profilePicture}
+                            alt="Profile"
+                            className="w-8 h-8 rounded-full"
+                          />
+                        ) : (
+                          <img
+                            src={placeholder}
+                            alt="Profile"
+                            className="w-8 h-8 rounded-full"
+                          />
+                        )}
+                      </td>
+                      <td className="py-2 px-4 border-b">{entry.score.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </>
+
+        </div>
       }
     </>
   );

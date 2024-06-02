@@ -10,7 +10,6 @@ export default function Header() {
                 <MainNav />
                 <div className="w-full flex items-center justify-center">
                     <DynamicWidget />
-
                 </div>
                 <div className="bg-white/5 w-[50rem] h-full">
 

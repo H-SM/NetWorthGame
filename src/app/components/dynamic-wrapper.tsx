@@ -45,7 +45,7 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
 
   return (
     <DynamicContextProvider
-      theme='dark'
+      theme='light'
       settings={{
         environmentId: `${process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ? process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID : ""}`,
         walletConnectors: [EthereumWalletConnectors],
