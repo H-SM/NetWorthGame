@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server';
 import { redis } from '@/app/lib/redis';
 import { PrismaClient, User } from '@prisma/client';
 
-// const CACHE_EXPIRY = 40 * 60; //FOR 40 MIN 
-const CACHE_EXPIRY = 24 * 60 * 60; //once a day 
+const CACHE_EXPIRY = 40 * 60; //FOR 40 MIN 
+// const CACHE_EXPIRY = 24 * 60 * 60; //once a day 
 
 const prisma = new PrismaClient();
 export async function GET(req: Request) {
