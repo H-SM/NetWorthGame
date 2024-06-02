@@ -21,8 +21,6 @@ interface NumberProps {
   n: number;
 }
 
-
-
 const Number: React.FC<NumberProps> = ({ n }) => {
   const { number } = useSpring({
     from: { number: 0 },
@@ -76,7 +74,6 @@ export default function Home() {
           manageUser(userData, user.verifiedCredentials?.[0]?.address ?? "")
         }
         setTimeout(() => {
-          console.log(user);
           setLoader(0);
         }, 300);
       }
@@ -104,7 +101,6 @@ export default function Home() {
         schema: "public",
         table: "UserScores"
       }, () => {
-        console.log('Change received!');
         fetchData();
       }).subscribe();
 

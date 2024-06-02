@@ -76,7 +76,6 @@ export function ContextProvider({ children }: Props) {
     useEffect(() => {
         const multiValue = JSON.parse(localStorage.getItem('multi') ?? 'false');
         const storedTheme = localStorage.getItem('theme');
-        console.log("theme here :", storedTheme);
         if (storedTheme === null) {
             localStorage.setItem('theme', 'false');
             setTheme(false);
@@ -145,13 +144,10 @@ export function ContextProvider({ children }: Props) {
 
             if (response.ok) {
                 const user = await response.json();
-                console.log(user);
                 changeSettings(user.settings);
                 changeScore(user.scores);
                 //update multiplier over "multi"
-                console.log(multi);
                 if (mul === true) {
-                    console.log(dynamicUserId);
                     multiplerUpdater(dynamicUserId);
                     toggleMulti();
                 }
@@ -176,7 +172,6 @@ export function ContextProvider({ children }: Props) {
 
                 if (newUserResponse.ok) {
                     const newUser = await newUserResponse.json();
-                    console.log(newUser);
                     changeSettings(newUser.settings);
                     changeScore(newUser.scores);
                     if (mul === true) {
@@ -217,11 +212,9 @@ export function ContextProvider({ children }: Props) {
                 }, 0)
 
                 if (scores.userId) {
-                    // TODO: REDUCE THIS TO 0 [+10 just for testing]
-                    let totalWorth = (netWorth + 10) * scores.multiplier;
+                    let totalWorth = (netWorth) * scores.multiplier;
 
-                    console.log(scores.netWorth, netWorth + 10);
-                    if (scores.netWorth !== netWorth + 10) {
+                    if (scores.netWorth !== netWorth) {
                         netWorthUpdater(scores.userId, netWorth + 10, totalWorth)
                     }
                 } else {
@@ -249,7 +242,6 @@ export function ContextProvider({ children }: Props) {
             if (res.ok) {
                 const response = await res.json();
                 setScore(response);
-                console.log("net worth :", netWorth, response);
             } else {
                 // console.error(response.error);
                 // // TODO: make a modal for this
@@ -275,7 +267,6 @@ export function ContextProvider({ children }: Props) {
             if (res.ok) {
                 const response = await res.json();
                 setScore(response);
-                console.log(response);
             } else {
                 throw new Error("Failed to update netWorth");
             }

@@ -16,7 +16,6 @@ const Settings = () => {
   const [details, setDetails] = useState<UserSettings>(settings);
 
   useEffect(() => {
-    console.log(settings);
     setDetails(settings);
   }, [settings])
 
