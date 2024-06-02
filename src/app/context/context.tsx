@@ -215,7 +215,7 @@ export function ContextProvider({ children }: Props) {
                     let totalWorth = (netWorth) * scores.multiplier;
 
                     if (scores.netWorth !== netWorth) {
-                        netWorthUpdater(scores.userId, netWorth + 10, totalWorth)
+                        netWorthUpdater(scores.userId, netWorth, totalWorth)
                     }
                 } else {
                     // router.push("/login");
